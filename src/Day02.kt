@@ -8,7 +8,9 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        return 0
+        val result = input.map { parsePosition(it) }
+            .fold(AimedPosition(0, 0 ,0)) { aimed, position -> aimed + position }
+        return result.depth * result.forward
     }
 
     val input = readInput("Day02")
@@ -19,6 +21,13 @@ fun main() {
 data class Position(val depth: Int, val forward: Int) {
     operator fun plus(other: Position): Position {
         return Position(depth + other.depth, forward + other.forward)
+    }
+}
+
+data class AimedPosition(val depth: Int, val forward: Int, val aim: Int) {
+    operator fun plus(position: Position): AimedPosition {
+        val newAim = aim + position.depth
+        return AimedPosition(depth + position.forward * newAim, forward + position.forward, newAim)
     }
 }
 
