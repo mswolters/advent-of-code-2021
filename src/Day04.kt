@@ -6,7 +6,7 @@ fun main() {
 
         for (number in numbers) {
             boards = boards.map { it.withCrossed(number) }
-            val finishedBoards = boards.filter { anyFinished(it.columns) || anyFinished(it.rows) }
+            val finishedBoards = boards.filter { complete(it) }
             if (finishedBoards.any()) {
                 return finishedBoards.single().numbers.filter { !it.crossed }.sumOf { it.number } * number
             }
@@ -15,8 +15,20 @@ fun main() {
         throw IllegalStateException("No result?")
     }
 
+    // Find the last board that wins
     fun part2(input: List<String>): Int {
-        return 0
+        val numbers = input.first().split(',').asInts()
+        var boards = parseBoards(input.drop(2))
+
+        for (number in numbers) {
+            val incompleteBoards = boards.map { it.withCrossed(number) }.filterNot { complete(it) }
+            if (boards.size == 1 && incompleteBoards.isEmpty()) {
+                return boards.single().withCrossed(number).numbers.filter { !it.crossed }.sumOf { it.number } * number
+            }
+            boards = incompleteBoards
+        }
+
+        throw IllegalStateException("No result?")
     }
 
     val input = readInput("Day04")
@@ -50,6 +62,10 @@ fun parseBoards(input: List<String>): List<Board> {
 }
 
 fun anyFinished(numbers: List<List<BingoNumber>>): Boolean = numbers.any { it.all { number -> number.crossed } }
+
+fun complete(board: Board): Boolean {
+    return anyFinished(board.columns) || anyFinished(board.rows)
+}
 
 data class BingoNumber(val number: Int, val crossed: Boolean = false) {
     override fun toString(): String {
