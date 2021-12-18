@@ -24,3 +24,5 @@ fun <T> Iterable<T>.byNth(n: Int): List<List<T>> {
     }
     return result
 }
+
+fun Int.pow(exponent: Int): Int = toBigInteger().pow(exponent).toInt()
